@@ -1,0 +1,267 @@
+" Modeline and Notes {
+" vim: set sw=4 ts=4 sts=4 et tw=78 foldmarker={,} foldlevel=0 foldmethod=marker spell:
+"
+"                    __ _ _____              _
+"         ___ _ __  / _/ |___ /      __   __(_)_ __ ___
+"        / __| '_ \| |_| | |_ \ _____\ \ / /| | '_ ` _ \
+"        \__ \ |_) |  _| |___) |_____|\ V / | | | | | | |
+"        |___/ .__/|_| |_|____/        \_/  |_|_| |_| |_|
+"            |_|
+"
+"   This is the personal .vimrc.bundles file of Steve Francia.
+"   While much of it is beneficial for general use, I would
+"   recommend picking out the parts you want and understand.
+"
+"   You can find me at http://spf13.com
+" }
+
+" Environment {
+
+    " Basics {
+        set nocompatible        " Must be first line
+        set background=dark     " Assume a dark background
+    " }
+
+    " Windows Compatible {
+        " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
+        " across (heterogeneous) systems easier.
+        if has('win32') || has('win64')
+          set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+
+          " Be nice and check for multi_byte even if the config requires
+          " multi_byte support most of the time
+          if has("multi_byte")
+            " Windows cmd.exe still uses cp850. If Windows ever moved to
+            " Powershell as the primary terminal, this would be utf-8
+            set termencoding=cp850
+            " Let Vim use utf-8 internally, because many scripts require this
+            set encoding=utf-8
+            setglobal fileencoding=utf-8
+            " Windows has traditionally used cp1252, so it's probably wise to
+            " fallback into cp1252 instead of eg. iso-8859-15.
+            " Newer Windows files might contain utf-8 or utf-16 LE so we might
+            " want to try them first.
+            set fileencodings=ucs-bom,utf-8,utf-16le,cp1252,iso-8859-15
+          endif
+        endif
+    " }
+
+    " Setup Bundle Support {
+        " The next three lines ensure that the ~/.vim/bundle/ system works
+        filetype off
+        set rtp+=~/.vim/bundle/vundle
+        call vundle#rc()
+    " }
+
+" }
+
+" Bundles {
+
+    " Deps {
+        Bundle 'gmarik/vundle', {'pinned' :1}
+        Bundle 'MarcWeber/vim-addon-mw-utils', {'pinned': 1}
+        Bundle 'tomtom/tlib_vim', {'pinned': 1}
+        Bundle 'dkprice/vim-easygrep', {'pinned': 1}
+        if executable('ack-grep')
+            let g:ackprg="ack-grep -H --nocolor --nogroup --column"
+            Bundle 'mileszs/ack.vim', {'pinned': 1}
+        elseif executable('ack')
+            Bundle 'mileszs/ack.vim', {'pinned': 1}
+        elseif executable('ag')
+            Bundle 'mileszs/ack.vim', {'pinned': 1}
+            let g:ackprg = 'ag --nogroup --nocolor --column --smart-case'
+        endif
+    " }
+
+    " Use local bundles config if available {
+        if filereadable(expand("~/.vimrc.bundles.local"))
+            source ~/.vimrc.bundles.local
+        endif
+    " }
+
+    " Use fork bundles config if available {
+        if filereadable(expand("~/.vimrc.bundles.fork"))
+            source ~/.vimrc.bundles.fork
+        endif
+    " }
+
+    " In your .vimrc.bundles.local file
+    " list only the plugin groups you will use
+    if !exists('g:spf13_bundle_groups')
+        " ['general', 'neocomplcache', 'programming', 'php', 'ruby', 'python', 'go', 'twig', 'javascript', 'haskell', 'html', 'misc', 'scala']
+        let g:spf13_bundle_groups=['general', 'neocomplcache', 'programming', 'twig', 'javascript', 'html', 'misc']
+    endif
+
+    " To override all the included bundles, add the following to your
+    " .vimrc.bundles.local file:
+    "   let g:override_spf13_bundles = 1
+    if !exists("g:override_spf13_bundles")
+
+    " General {
+        if count(g:spf13_bundle_groups, 'general')
+            Bundle 'scrooloose/nerdtree', {'pinned': 1}
+            Bundle 'altercation/vim-colors-solarized', {'pinned': 1}
+            Bundle 'spf13/vim-colors', {'pinned': 1}
+            Bundle 'tpope/vim-surround', {'pinned': 1}
+            Bundle 'spf13/vim-autoclose', {'pinned': 1}
+            Bundle 'kien/ctrlp.vim', {'pinned': 1}
+            Bundle 'terryma/vim-multiple-cursors', {'pinned': 1}
+            Bundle 'vim-scripts/sessionman.vim', {'pinned': 1}
+            Bundle 'matchit.zip', {'pinned': 1}
+            if (has("python") || has("python3")) && exists('g:spf13_use_powerline') && !exists('g:spf13_use_old_powerline')
+                Bundle 'Lokaltog/powerline', {'rtp':'/powerline/bindings/vim'}
+            elseif exists('g:spf13_use_powerline') && exists('g:spf13_use_old_powerline')
+                Bundle 'Lokaltog/vim-powerline', {'pinned': 1}
+            else
+                Bundle 'bling/vim-airline', {'pinned': 1}
+            endif
+            Bundle 'bling/vim-bufferline', {'pinned': 1}
+            Bundle 'Lokaltog/vim-easymotion', {'pinned': 1}
+            Bundle 'godlygeek/csapprox', {'pinned': 1}
+            Bundle 'jistr/vim-nerdtree-tabs', {'pinned': 1}
+            Bundle 'flazz/vim-colorschemes', {'pinned': 1}
+            Bundle 'mbbill/undotree', {'pinned': 1}
+            " Bundle 'myusuf3/numbers.vim'
+            Bundle 'nathanaelkane/vim-indent-guides', {'pinned': 1}
+            if !exists('g:spf13_no_views')
+                Bundle 'vim-scripts/restore_view.vim', {'pinned': 1}
+            endif
+            Bundle 'mhinz/vim-signify', {'pinned': 1}
+            Bundle 'tpope/vim-abolish.git', {'pinned': 1}
+            Bundle 'osyo-manga/vim-over', {'pinned': 1}
+            Bundle 'justinmk/vim-sneak', {'pinned': 1}
+        endif
+    " }
+
+    " General Programming {
+        if count(g:spf13_bundle_groups, 'programming')
+            " Pick one of the checksyntax, jslint, or syntastic
+            Bundle 'scrooloose/syntastic', {'pinned': 1}
+            Bundle 'tpope/vim-fugitive', {'pinned': 1}
+            Bundle 'mattn/webapi-vim', {'pinned': 1}
+            Bundle 'mattn/gist-vim', {'pinned': 1}
+            Bundle 'godlygeek/tabular', {'pinned': 1}
+            Bundle 'scrooloose/nerdcommenter', {'pinned': 1}
+            if executable('ctags')
+                Bundle 'majutsushi/tagbar', {'pinned': 1}
+            endif
+        endif
+    " }
+
+    " Snippets & AutoComplete {
+        if count(g:spf13_bundle_groups, 'snipmate')
+            Bundle 'garbas/vim-snipmate', {'pinned': 1}
+            Bundle 'honza/vim-snippets', {'pinned': 1}
+            " Source support_function.vim to support vim-snippets.
+            if filereadable(expand("~/.vim/bundle/vim-snippets/snippets/support_functions.vim"))
+                source ~/.vim/bundle/vim-snippets/snippets/support_functions.vim
+            endif
+        elseif count(g:spf13_bundle_groups, 'neocomplcache')
+            Bundle 'Shougo/neocomplcache', {'pinned': 1}
+            Bundle 'Shougo/neosnippet', {'pinned': 1}
+            Bundle 'honza/vim-snippets', {'pinned': 1}
+        elseif count(g:spf13_bundle_groups, 'neocomplete')
+            Bundle 'Shougo/neocomplete.vim.git', {'pinned': 1}
+            Bundle 'Shougo/neosnippet', {'pinned': 1}
+            Bundle 'honza/vim-snippets', {'pinned': 1}
+        endif
+    " }
+
+    " PHP {
+        if count(g:spf13_bundle_groups, 'php')
+            Bundle 'spf13/PIV'
+            Bundle 'arnaud-lb/vim-php-namespace'
+        endif
+    " }
+
+    " Python {
+        if count(g:spf13_bundle_groups, 'python')
+            " Pick either python-mode or pyflakes & pydoc
+            Bundle 'klen/python-mode'
+            Bundle 'python.vim'
+            Bundle 'python_match.vim'
+            Bundle 'pythoncomplete'
+        endif
+    " }
+
+    " Javascript {
+        if count(g:spf13_bundle_groups, 'javascript')
+            Bundle 'elzr/vim-json', {'pinned': 1}
+            Bundle 'groenewege/vim-less', {'pinned': 1}
+            Bundle 'pangloss/vim-javascript', {'pinned': 1}
+            Bundle 'briancollins/vim-jst', {'pinned': 1}
+            Bundle 'kchmck/vim-coffee-script', {'pinned': 1}
+        endif
+    " }
+
+    " Java {
+        if count(g:spf13_bundle_groups, 'scala')
+            Bundle 'derekwyatt/vim-scala'
+            Bundle 'derekwyatt/vim-sbt'
+        endif
+    " }
+
+    " Haskell {
+        if count(g:spf13_bundle_groups, 'haskell')
+            Bundle 'travitch/hasksyn'
+            Bundle 'dag/vim2hs'
+            Bundle 'Twinside/vim-haskellConceal'
+            Bundle 'lukerandall/haskellmode-vim'
+            Bundle 'ujihisa/neco-ghc'
+            Bundle 'eagletmt/ghcmod-vim'
+            Bundle 'Shougo/vimproc'
+            Bundle 'adinapoli/cumino'
+            Bundle 'bitc/vim-hdevtools'
+        endif
+    " }
+
+    " HTML {
+        if count(g:spf13_bundle_groups, 'html')
+            Bundle 'amirh/HTML-AutoCloseTag', {'pinned': 1}
+            Bundle 'hail2u/vim-css3-syntax', {'pinned': 1}
+            Bundle 'tpope/vim-haml', {'pinned': 1}
+            Bundle 'mattn/emmet-vim', {'pinned': 1}
+        endif
+    " }
+
+    " Ruby {
+        if count(g:spf13_bundle_groups, 'ruby')
+            Bundle 'tpope/vim-rails'
+            let g:rubycomplete_buffer_loading = 1
+            "let g:rubycomplete_classes_in_global = 1
+            "let g:rubycomplete_rails = 1
+        endif
+    " }
+
+    " Go Lang {
+        if count(g:spf13_bundle_groups, 'go')
+            Bundle 'jnwhiteh/vim-golang'
+            Bundle 'spf13/vim-gocode'
+        endif
+    " }
+
+    " Misc {
+        if count(g:spf13_bundle_groups, 'misc')
+            Bundle 'tpope/vim-markdown', {'pinned': 1}
+            Bundle 'spf13/vim-preview', {'pinned': 1}
+            Bundle 'tpope/vim-cucumber', {'pinned': 1}
+            Bundle 'quentindecock/vim-cucumber-align-pipes', {'pinned': 1}
+            Bundle 'Puppet-Syntax-Highlighting', {'pinned': 1}
+        endif
+    " }
+
+    " Twig {
+        if count(g:spf13_bundle_groups, 'twig')
+            Bundle 'beyondwords/vim-twig', {'pinned': 1}
+        endif
+    " }
+
+    endif
+
+" }
+
+" General {
+    " set autowrite                  " automatically write a file when leaving a modified buffer
+    set shortmess+=filmnrxoOtT      " Abbrev. of messages (avoids 'hit enter')
+" }
+
